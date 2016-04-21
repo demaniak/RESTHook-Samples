@@ -9,7 +9,7 @@ public interface CaptainHookApiService {
     Call<Hook> createHook(@Body Hook hook);
 
     public static final Retrofit retrofit = new Retrofit.Builder()
-            .baseUrl("https://webhooks.whereismytransport.com:443/api/v1/subscriptions")
+            .baseUrl("https://webhooks.whereismytransport.com:443/api/v1/subscriptions/")
             .addConverterFactory(GsonConverterFactory.create())
             .build();
 }
