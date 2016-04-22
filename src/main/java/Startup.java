@@ -6,6 +6,7 @@ import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import javax.xml.bind.DatatypeConverter;
 import java.util.ArrayList;
+import java.util.Base64;
 
 import static spark.Spark.get;
 import static spark.Spark.post;
@@ -39,7 +40,7 @@ public class Startup {
         post("/hooks/alerts", (req, res) -> {
             if(req.headers().contains("X-Hook-Secret")) {
                 // store secret
-                Secret = DatatypeConverter.parseBase64Binary(req.headers("X-Hook-Secret"));
+                Secret = Base64.getDecoder().decode(req.headers("X-Hook-Secret"));
                 res.header("X-Hook-Secret", req.headers("X-Hook-Secret"));
                 res.status(200);
                 logs.add("X-Hook-Secret received");
@@ -47,7 +48,6 @@ public class Startup {
             } else if(req.headers().contains("X-Hook-Signature")){
                 String body=req.body();
                 logs.add(body);
-
                 String bodyHash = "";
                 try {
                     bodyHash = encode(Secret, body.getBytes("UTF-8"));
@@ -67,9 +67,9 @@ public class Startup {
                     res.status(403);
                 }
                 System.out.println(bodyHash);
-                System.out.println("Message is:\n"+res.body());
+                System.out.println("Message is:\n"+body);
 
-                alerts.add(bodyHash);
+                alerts.add(body);
                 logs.add("Alert received.");
             } else{
                 res.status(403);
@@ -122,10 +122,6 @@ public class Startup {
 
             }
         });
-
-
-
-
 
     }
 
