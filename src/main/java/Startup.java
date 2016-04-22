@@ -67,7 +67,7 @@ public class Startup {
                     res.status(403);
                 }
                 System.out.println(bodyHash);
-                System.out.println("Message is:\n"+res.body());
+                System.out.println("Message is:\n"+req.body());
 
                 alerts.add(bodyHash);
                 logs.add("Alert received.");
