@@ -1,12 +1,14 @@
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
-import com.sun.org.apache.xml.internal.security.utils.Base64;
-import org.apache.commons.codec.binary.Hex;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
+import javax.xml.bind.DatatypeConverter;
 import java.util.ArrayList;
-import static spark.Spark.*;
+
+import static spark.Spark.get;
+import static spark.Spark.post;
 
 public class Startup {
 
@@ -19,6 +21,8 @@ public class Startup {
     static ArrayList<String> logs = new ArrayList();
 
     public static void main(String [] args){
+
+
         System.out.println("Startup class loaded.");
         logs.add("Startup class loaded.");
 
@@ -35,22 +39,29 @@ public class Startup {
         post("/hooks/alerts", (req, res) -> {
             if(req.headers().contains("X-Hook-Secret")) {
                 // store secret
-                Secret = Base64.decode(req.headers("X-Hook-Secret"));
+                Secret = DatatypeConverter.parseBase64Binary(req.headers("X-Hook-Secret"));
                 res.header("X-Hook-Secret", req.headers("X-Hook-Secret"));
                 res.status(200);
-
                 logs.add("X-Hook-Secret received");
-            } else if(req.headers().contains("X-Hook-Signature")) {
+                logs.add(req.headers("X-Hook-Secret"));
+            } else if(req.headers().contains("X-Hook-Signature")){
+                String body=req.body();
+                logs.add(body);
+
                 String bodyHash = "";
                 try {
-                    bodyHash = encode(Secret, res.body());
+                    bodyHash = encode(Secret, body.getBytes("UTF-8"));
+                    logs.add(bodyHash);
                 }
                 catch (Exception e) {
                     logs.add("Exception occurred encoding hash: " + e.getStackTrace().toString());
                     res.status(500);
                     return res;
                 }
-                if(bodyHash.equals(req.headers("X-Hook-Signature"))){
+                String otherBodyHash=req.headers("X-Hook-Signature");
+                logs.add(otherBodyHash);
+
+                if(bodyHash.equals(otherBodyHash)){
                     res.status(200);
                 }else{
                     res.status(403);
@@ -118,11 +129,10 @@ public class Startup {
 
     }
 
-    private static String encode(byte[] key, String data) throws Exception {
+    private static String encode(byte[] key, byte[] data) throws Exception {
         Mac sha256_HMAC = Mac.getInstance("HmacSHA256");
-        SecretKeySpec secret_key = new SecretKeySpec(key, "HmacSHA256");
+        SecretKeySpec secret_key = new SecretKeySpec(key, sha256_HMAC.getAlgorithm());
         sha256_HMAC.init(secret_key);
-
-        return Hex.encodeHexString(sha256_HMAC.doFinal(data.getBytes("UTF-8")));
+        return DatatypeConverter.printBase64Binary(sha256_HMAC.doFinal(data));
     }
 }
