@@ -7,6 +7,7 @@ import javax.crypto.spec.SecretKeySpec;
 import javax.xml.bind.DatatypeConverter;
 import java.util.ArrayList;
 import java.util.Base64;
+import java.util.Map;
 
 import static spark.Spark.get;
 import static spark.Spark.port;
@@ -84,6 +85,13 @@ public class Startup implements SparkApplication{
 
     @Override
     public void init() {
+        try {
+            String http_platform_port = System.getenv("HTTP_PLATFORM_PORT");
+            port(Integer.parseInt(http_platform_port));
+        }
+        catch (Exception e){
+        }
+
         System.out.println("Startup class loaded.");
         logs.add("Startup class loaded.");
 
