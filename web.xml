@@ -3,10 +3,9 @@
     <filter-class>spark.servlet.SparkFilter</filter-class>
     <init-param>
         <param-name>applicationClass</param-name>
-        <param-value>com.company.YourApplication</param-value>
+        <param-value>Startup</param-value>
     </init-param>
 </filter>
-
 <filter-mapping>
 <filter-name>SparkFilter</filter-name>
 <url-pattern>/*</url-pattern>
