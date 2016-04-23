@@ -1,3 +1,6 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+
+<web-app>
 <filter>
     <filter-name>SparkFilter</filter-name>
     <filter-class>spark.servlet.SparkFilter</filter-class>
@@ -10,3 +13,4 @@
 <filter-name>SparkFilter</filter-name>
 <url-pattern>/*</url-pattern>
 </filter-mapping>
+</web-app>
