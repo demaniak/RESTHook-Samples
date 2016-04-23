@@ -8,12 +8,16 @@ sourceCompatibility = 1.8
 
 repositories {
     mavenCentral()
+
 }
 
-war{
+mainClassName  = 'Startup'
+
+war {
+    from 'src/main/java' // adds a file-set to the root of the archive
+    webXml = file('web.xml') // copies a file to WEB-INF/web.xml
     baseName = 'Startup'
 }
-mainClassName  = 'Startup'
 
 
 dependencies {
