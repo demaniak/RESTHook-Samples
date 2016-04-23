@@ -23,6 +23,7 @@ public class Startup implements SparkApplication{
     private ArrayList<String> alerts = new ArrayList();
     private ArrayList<String> logs = new ArrayList();
     private static int port;
+
     public static void main(String [] args){
         if(args.length>0){
             port=Integer.parseInt(args[0]);
@@ -90,7 +91,9 @@ public class Startup implements SparkApplication{
             port(Integer.parseInt(http_platform_port));
         }
         catch (Exception e){
+            port(4567);
         }
+
 
         System.out.println("Startup class loaded.");
         logs.add("Startup class loaded.");
