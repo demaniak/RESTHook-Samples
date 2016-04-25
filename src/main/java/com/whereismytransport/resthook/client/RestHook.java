@@ -48,7 +48,7 @@ public class RestHook {
         this.messages = messages;
 
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(serverUrl + "/api/v1/subscriptions/")
+                .baseUrl(serverUrl)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 

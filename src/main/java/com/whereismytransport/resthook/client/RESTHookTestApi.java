@@ -60,6 +60,7 @@ public class RESTHookTestApi {
                 URL target = new URL(req.body());
                 String host=target.getProtocol()+"://"+target.getAuthority();
                 String path=target.getFile();
+
                 hooks.add(new RestHook(host, path, baseUrl, clientCredentials, logs, messages, restHookRepository));
                 res.status(200);
                 return "Webhook Created with path";
