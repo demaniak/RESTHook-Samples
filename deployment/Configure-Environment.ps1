@@ -16,7 +16,7 @@ Param(
 
 Import-Module $PSScriptRoot\Merge-Tokens.psm1
 
-$content=(Get-Content $configFile | Merge-Tokens -tokens @{'AzureStorageConnectionString'=$connectionString; 'ClientId'=$clientId; 'ClientSecret'=$clientSecret; }) | Out-String;
+$content=(Get-Content $configFile | Merge-Tokens -tokens @{'AzureStorageConnectionString'=$connectionString; 'ClientId'=$clientId; 'ClientSecret'=$clientSecret; 'Url'=''; 'Port'='' }) | Out-String;
 
 if($simulated){
     Write-Output $content;
