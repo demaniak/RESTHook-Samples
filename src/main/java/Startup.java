@@ -41,7 +41,7 @@ public class Startup implements SparkApplication{
         }
         String url=RoleEnvironment.url;
         if(System.getenv().containsKey("WEBSITE_SITE_NAME")){
-            port = Integer.parseInt(System.getenv("WEBSITE_SITE_NAME"));
+            url= System.getenv("WEBSITE_SITE_NAME");
         }
 
         restHookTestApi = new RESTHookTestApi(port, url,repository,RoleEnvironment.clientId,RoleEnvironment.clientSecret);
