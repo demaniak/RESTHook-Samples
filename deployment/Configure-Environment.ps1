@@ -22,5 +22,5 @@ if($simulated){
     Write-Output $content;
 }
 else {
-    Out-File -FilePath $configFile -InputObject $content
+    Out-File -FilePath $configFile -InputObject $content -Encoding "utf8"
 }
