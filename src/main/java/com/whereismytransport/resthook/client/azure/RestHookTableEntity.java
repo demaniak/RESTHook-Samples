@@ -16,7 +16,7 @@ public class RestHookTableEntity extends TableServiceEntity {
     public String relativeCallbackUrl;
     public String relativeServerUrl;
 
-
+    public RestHookTableEntity(){}
     public RestHookTableEntity(String relativeCallbackUrl, String secret, String serverUrl, String relativeServerUrl){
         this.secret = secret;
         this.serverUrl = serverUrl;
