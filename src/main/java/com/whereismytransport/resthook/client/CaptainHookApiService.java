@@ -1,15 +1,17 @@
 package com.whereismytransport.resthook.client;
 
 import retrofit2.Call;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
-import retrofit2.http.Body;
-import retrofit2.http.Header;
-import retrofit2.http.POST;
+import retrofit2.http.*;
 
+
+/** This class represents some of the available webhooks one may make
+ *
+ */
 public interface CaptainHookApiService {
-    @POST("alerts")
-    Call<Hook> createHook(@Body Hook hook, @Header("Authorization") String authorization);
 
-
+    /**
+     * Note that only users with the scope webhook:global may create global scopes
+     */
+    @POST("{{path}}")
+    Call createRestHook(@Url String creationPath, @Body RESTHookRequest hook, @Header("Authorization") String authorization);
 }

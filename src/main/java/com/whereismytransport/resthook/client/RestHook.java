@@ -3,15 +3,17 @@ package com.whereismytransport.resthook.client;
 import com.whereismytransport.resthook.client.auth.ClientCredentials;
 import com.whereismytransport.resthook.client.auth.Token;
 import com.whereismytransport.resthook.client.auth.TokenService;
-import com.whereismytransport.resthook.client.azure.ClientRestHookTableEntity;
 import retrofit2.Call;
 import retrofit2.Callback;
-import retrofit2.Response;
 import retrofit2.Retrofit;
+import retrofit2.*;
 import retrofit2.converter.gson.GsonConverterFactory;
+import spark.Request;
+import spark.*;
 
-import java.util.Base64;
+
 import java.util.List;
+import java.util.Random;
 
 import static spark.Spark.post;
 
@@ -19,106 +21,144 @@ import static spark.Spark.post;
  * Created by Nick Cuthbert on 25/04/2016.
  */
 public class RestHook {
-    private List<String> logs;
     private TokenService tokenService = TokenService.retrofit.create(TokenService.class);
-    private CaptainHookApiService service;
-    private byte[] Secret;
+    private CaptainHookApiService restHookService;
+    private List<String> logs;
+    private List<String> messages;
 
-    public RestHook(String baseUrl, List<String> logs, List<String> messages, ClientRestHookTableEntity tableEntity){
-        this.logs=logs;
+    private String serverUrl;
+    private String serverRelativeUrl;
 
-        createWebHook(tableEntity);
+    private String relativeCallbackUrl;
+    public String secret;
 
-        post("hooks/"+tableEntity.endpoint,(req, res) -> {
-            if(req.headers().contains("X-Hook-Secret")) {
-                // store secret
-                tableEntity.setHookSecret(req.headers("X-Hook-Secret"));
-                Secret = Base64.getDecoder().decode(tableEntity.getHookSecret());
-                res.header("X-HookSecret", req.headers("X-Hook-Secret"));
-                res.status(200);
-                logs.add("X-Hook-Secret received");
-                logs.add(req.headers("X-Hook-Secret"));
-            } else if(req.headers().contains("X-Hook-Signature")){
-                String body=req.body();
-                logs.add(body);
-                String bodyHash = "";
-                try {
-                    bodyHash = encode(Secret, body.getBytes("UTF-8"));
-                    logs.add(bodyHash);
-                }
-                catch (Exception e) {
-                    logs.add("Exception occurred encoding hash: " + e.getStackTrace().toString());
-                    res.status(500);
-                    return res;
-                }
-                String otherBodyHash=req.headers("X-Hook-Signature");
-                logs.add(otherBodyHash);
+    public RestHook(String serverUrl,
+                    String serverRelativeUrl,
+                    String clientUrl,
+                    ClientCredentials clientCredentials,
+                    List<String> logs,
+                    List<String> messages,
+                    RestHookRepository restHookRepository) {
 
-                if(bodyHash.equals(otherBodyHash)){
-                    res.status(200);
-                }else{
-                    res.status(403);
-                }
-                System.out.println(bodyHash);
-                System.out.println("Message is:\n"+body);
-                messages.add(body);
-                logs.add("Webhook received.");
-            } else{
-                res.status(403);
-                logs.add("Access denied: X-Hook-Signature or X-Hook-Secret is not present in headers.");
-            }
-            return res;
-        });
+        this.logs = logs;
+        this.serverUrl = serverUrl;
+
+        this.serverRelativeUrl = serverRelativeUrl;
+        this.relativeCallbackUrl = "hooks/" + Math.abs(new Random().nextInt());
+        this.messages = messages;
 
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(baseUrl+"/api/v1/subscriptions/")
+                .baseUrl(serverUrl + "/api/v1/subscriptions/")
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
-        service= retrofit.create(CaptainHookApiService.class);
-    }
 
+        restHookService = retrofit.create(CaptainHookApiService.class);
 
-    private void createWebHook(ClientRestHookTableEntity entity) {
-
-        // Tell CaptainHook that we want to subscribe to Alerts
-        Call getTokenCall=tokenService.createToken(new ClientCredentials(ConfigStrings.clientId, ConfigStrings.clientSecret).getMap());
-        getTokenCall.enqueue(new Callback() {
-            @Override
-            public void onResponse(Call call, Response response) {
-                System.out.println(response.code());
-                Call createHookCall =  service.createGlobalAlertRESTHook(new RESTHookRequest(ConfigStrings.url +"/hooks/"+entity.endpoint, "Alerts webhook"),"Bearer "+((Token)response.body()).access_token);
-                createHookCall.enqueue(new Callback() {
-                    @Override
-                    public void onResponse(Call call, Response response2) {
-                        if(response2.isSuccessful()) {
-                            System.out.println("Created RESTHook Successfully");
-                            logs.add("Created RESTHook Successfully");
-                        }
-                        else {
-                            System.out.println(response.message());
-                            System.out.println("Something went wrong calling webhook setup. Response code: " + response2.code());
-                            logs.add("Something went wrong calling webhook setup. Response code: " + response2.code());
-                        }
-                    }
-
-                    @Override
-                    public void onFailure(Call call, Throwable t) {
-                        if(t.getCause() == null) {
-                            logs.add("CreateHookCall onFailure called.");
-                        } else {
-                            logs.add(t.getCause().toString());
-                            logs.add(t.getCause().getLocalizedMessage());
-                            logs.add("Error occurred in calling CaptainHook.");
-                        }
+        createHook(clientCredentials,clientUrl,() -> {
+                post(this.relativeCallbackUrl, (req, res) -> {
+                    if (req.headers().contains("X-Hook-Secret")) {
+                        // store secret
+//                    res.setHookSecret();
+                        this.secret = req.headers("X-Hook-Secret");
+                        restHookRepository.addRestHook(this.relativeCallbackUrl, this.secret, this.serverUrl, this.serverRelativeUrl);
+                        res.header("X-HookSecret", req.headers("X-Hook-Secret"));
+                        res.status(200);
+                        logs.add("X-Hook-Secret received");
+                        logs.add(req.headers("X-Hook-Secret"));
+                        return res;
+                    } else {
+                        return handleHookMessage(req, res);
                     }
                 });
-            }
-
-            @Override
-            public void onFailure(Call call, Throwable t) {
-            }
         });
     }
 
+    public RestHook(String serverUrl,
+                    String serverRelativeUrl,
+                    List<String> logs,
+                    List<String> messages,
+                    String secret)
+    {
+        this.serverUrl=serverUrl;
+        this.serverRelativeUrl=serverRelativeUrl;
+        this.secret=secret;
+        this.logs=logs;
+        this.messages=messages;
+        post(this.relativeCallbackUrl, this::handleHookMessage);
+    }
+
+    private spark.Response handleHookMessage(Request req, spark.Response res) {
+        if (req.headers().contains("X-Hook-Signature")) {
+            String body = req.body();
+            String xHookSignature = req.headers("X-Hook-Signature");
+            messages.add(req.body());
+            try {
+                if (HmacUtilities.validBody(this, body, xHookSignature)) {
+                    res.status(200); //OK
+                } else {
+                    res.status(403); //Access denied
+                    String responseMessage = "Access denied: X-Hook-Signature does not match the secret.";
+                    logs.add(responseMessage);
+                    res.body(responseMessage);
+                }
+            } catch (Exception e) {
+                String responseMessage = "Exception occurred encoding hash: " + e.getStackTrace().toString();
+                logs.add(responseMessage);
+                res.status(500); //Internal server error
+                return res;
+            }
+        } else {
+            res.status(403);
+            String responseMessage = "Access denied: X-Hook-Signature or X-Hook-Secret is not present in headers.";
+            logs.add(responseMessage);
+            res.body(responseMessage);
+        }
+        return res;
+    }
+
+
+    private void createHook(ClientCredentials clientCredentials,String clientUrl, Runnable onHookCreate) {
+        synchronized (this) {
+            // Get token to connect to CaptainHook
+            Call<Token> getTokenCall = tokenService.createToken(clientCredentials.getMap());
+
+            getTokenCall.enqueue(new Callback<Token>() {
+                @Override
+                public void onResponse(Call<Token> call, retrofit2.Response<Token> response) {
+
+                    Call createHookCall = restHookService.createRestHook(serverRelativeUrl, new RESTHookRequest(clientUrl + relativeCallbackUrl, "Test Webhook"),
+                            "Bearer " + ((Token) response.body()).access_token);
+
+                    createHookCall.enqueue(new Callback() {
+                        @Override
+                        public void onResponse(Call call, retrofit2.Response response2) {
+                            if (response2.isSuccessful()) {
+                                onHookCreate.run();
+
+                                logs.add("Created RESTHook Successfully");
+                            } else {
+                                logs.add("Something went wrong calling webhook setup. Response code: " + response2.code());
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Call call, Throwable t) {
+                            if (t.getCause() == null) {
+                                logs.add("CreateHookCall onFailure called.");
+                            } else {
+                                logs.add(t.getCause().toString());
+                                logs.add(t.getCause().getLocalizedMessage());
+                                logs.add("Error occurred in calling CaptainHook.");
+                            }
+                        }
+                    });
+                }
+
+                @Override
+                public void onFailure(Call call, Throwable t) {
+                }
+            });
+        }
+    }
 
 }

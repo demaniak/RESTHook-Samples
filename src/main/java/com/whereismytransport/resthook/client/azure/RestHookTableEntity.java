@@ -1,76 +1,69 @@
 package com.whereismytransport.resthook.client.azure;
 
 import com.microsoft.azure.storage.table.TableServiceEntity;
-import com.sun.deploy.net.URLEncoder;
+import java.net.URLEncoder;
 
 import java.io.UnsupportedEncodingException;
-import java.util.Random;
 
 /**
  * Created by Nick Cuthbert on 25/04/2016.
  */
 public class RestHookTableEntity extends TableServiceEntity {
 
-    public RestHookTableEntity(String target, String hookType){
-        this.partitionKey="TestClientSecrets";
-        this.endpoint = Math.abs(new Random().nextInt());
+    public static final String restHookPartitionKey ="ClientSecrets";
+    public String secret;
+    public String serverUrl;
+    public String relativeCallbackUrl;
+    public String relativeServerUrl;
+
+
+    public RestHookTableEntity(String relativeCallbackUrl, String secret, String serverUrl, String relativeServerUrl){
+        this.secret = secret;
+        this.serverUrl = serverUrl;
+        this.relativeServerUrl = relativeServerUrl;
+        this.relativeCallbackUrl=relativeCallbackUrl;
+        this.partitionKey=RestHookTableEntity.restHookPartitionKey;
+
         try {
-            this.rowKey= URLEncoder.encode(target+":"+hookType,"UTF-8");
-            this.target=target;
-            this.hookType=hookType;
+            this.rowKey= URLEncoder.encode(serverUrl+relativeServerUrl,"UTF-8");
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
     }
 
-    public RestHookTableEntity(String relativeCallbackUrl, String secret, String serverUrl, String relativeServerUrl
-                               this.partitionKey="TestClientSecrets";
-        this.endpoint = endpoint;
-        try {
-            this.rowKey= URLEncoder.encode(target+":"+hookType,"UTF-8");
-            this.hookSecret =hookSecret;
-            this.endpoint = endpoint;
-            this.target=target;
-            this.hookType=hookType;
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
+
+
+    public String getSecret() {
+        return secret;
     }
 
-    public int endpoint =-1;
-    public String hookSecret="";
-    public String target;
-    public String hookType;
-
-    public String getHookSecret(){
-        return hookSecret;
+    public void setSecret(String secret) {
+        this.secret = secret;
     }
 
-    public String getTarget() {
-        return target;
+    public String getServerUrl() {
+        return serverUrl;
     }
 
-    public void setTarget(String target) {
-        this.target = target;
+    public void setServerUrl(String serverUrl) {
+        this.serverUrl = serverUrl;
     }
 
-    public String getHookType() {
-        return hookType;
+    public String getRelativeServerUrl() {
+        return relativeServerUrl;
     }
 
-    public void setHookType(String hookType) {
-        this.hookType = hookType;
+    public void setRelativeServerUrl(String relativeServerUrl) {
+        this.relativeServerUrl = relativeServerUrl;
     }
 
-    public void setHookSecret(String hookSecret){
-        this.hookSecret =hookSecret;
+
+
+    public String getRelativeCallbackUrl() {
+        return relativeCallbackUrl;
     }
 
-    public void setEndpoint(int endpoint){
-        this.endpoint = endpoint;
-    }
-
-    public int getEndpoint(){
-        return endpoint;
+    public void setRelativeCallbackUrl(String relativeCallbackUrl) {
+        this.relativeCallbackUrl = relativeCallbackUrl;
     }
 }
