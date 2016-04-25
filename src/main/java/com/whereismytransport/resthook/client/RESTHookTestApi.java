@@ -62,10 +62,11 @@ public class RESTHookTestApi {
                 String path=target.getFile();
                 hooks.add(new RestHook(host, path, baseUrl, clientCredentials, logs, messages, restHookRepository));
                 res.status(200);
+                return "Webhook Created with path";
             }catch(Exception e){
                 res.status(500);
+                return "Couldn't create WebHook";
             }
-            return res;
         });
     }
 

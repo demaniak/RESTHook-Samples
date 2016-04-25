@@ -58,7 +58,7 @@ public class RestHook {
                 post(this.relativeCallbackUrl, (req, res) -> {
                     if (req.headers().contains("X-Hook-Secret")) {
                         // store secret
-//                    res.setHookSecret();
+
                         this.secret = req.headers("X-Hook-Secret");
                         restHookRepository.addRestHook(this.relativeCallbackUrl, this.secret, this.serverUrl, this.serverRelativeUrl);
                         res.header("X-HookSecret", req.headers("X-Hook-Secret"));
