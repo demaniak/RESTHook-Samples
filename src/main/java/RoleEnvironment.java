@@ -1,0 +1,10 @@
+/**
+ * Created by Nick Cuthbert on 25/04/2016.
+ */
+public class RoleEnvironment {
+    public static final String azureStorageConnectionString="{{AzureStorageConnectionString}}";
+    public static final String clientId="{{ClientId}}";
+    public static final String clientSecret="{{ClientSecret}}";
+    public static String url="{{Url}}";
+    public static String port="{{Port}}";
+}

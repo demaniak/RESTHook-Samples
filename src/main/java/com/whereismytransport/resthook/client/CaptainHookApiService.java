@@ -1,3 +1,5 @@
+package com.whereismytransport.resthook.client;
+
 import retrofit2.Call;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -9,8 +11,5 @@ public interface CaptainHookApiService {
     @POST("alerts")
     Call<Hook> createHook(@Body Hook hook, @Header("Authorization") String authorization);
 
-    public static final Retrofit retrofit = new Retrofit.Builder()
-            .baseUrl("http://localhost:444/api/v1/subscriptions/")
-            .addConverterFactory(GsonConverterFactory.create())
-            .build();
+
 }

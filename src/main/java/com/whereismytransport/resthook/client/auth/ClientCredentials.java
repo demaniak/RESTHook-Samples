@@ -1,3 +1,5 @@
+package com.whereismytransport.resthook.client.auth;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -7,6 +9,7 @@ import java.util.Map;
 public class ClientCredentials {
     public String grant_type="client_credentials";
     public String scope="TransitApi";
+
     public String client_id;
     public String client_secret;
     public ClientCredentials(String clientId, String clientSecret){

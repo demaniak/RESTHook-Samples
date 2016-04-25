@@ -1,7 +1,9 @@
+package com.whereismytransport.resthook.client.auth;
+
+import com.whereismytransport.resthook.client.auth.Token;
 import retrofit2.Call;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
-import retrofit2.http.Body;
 import retrofit2.http.FieldMap;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.POST;
