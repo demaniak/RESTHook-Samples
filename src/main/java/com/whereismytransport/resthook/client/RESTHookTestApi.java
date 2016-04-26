@@ -22,8 +22,8 @@ import static spark.Spark.*;
 public class RESTHookTestApi {
 
     private List<String> receivedWebhookBodies = new ArrayList<>();
-    private List<String> logs = new ArrayList<>();
-    private List<String> messages= new ArrayList<>();
+    private List<String> logs;
+    private List<String> messages;
     private RestHookRepository restHookRepository;
     private Map<UUID,RestHook> hooks;
     private ClientCredentials clientCredentials;
@@ -31,8 +31,9 @@ public class RESTHookTestApi {
     private int port;
     private String baseUrl;
 
-    public RESTHookTestApi(int port, String baseUrl, RestHookRepository restHookRepository,String clientId, String clientSecret){
-
+    public RESTHookTestApi(int port, String baseUrl, RestHookRepository restHookRepository,String clientId, String clientSecret,List<String> logs,List<String> messages){
+        this.logs=logs;
+        this.messages=messages;
         this.restHookRepository=restHookRepository;
         List<RestHook> restHooks = restHookRepository.getRestHooks();
         hooks= IntStream.range(0,restHooks.size()).boxed().collect(Collectors.toMap(i->restHooks.get(i).index,i->restHooks.get(i)));
