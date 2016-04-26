@@ -12,7 +12,7 @@ public class Startup implements SparkApplication{
     private static ArrayList<String> logs= new ArrayList<>();
     private static ArrayList<String> messages=new ArrayList<> ();
     public static void main(String [] args){
-        repository=new AzureRestHookRepository(RoleEnvironment.azureStorageConnectionString,RoleEnvironment.url);
+        repository=new AzureRestHookRepository(RoleEnvironment.azureStorageConnectionString,RoleEnvironment.url,logs);
         repository.initialize(logs,messages);
         restHookTestApi = new RESTHookTestApi(RoleEnvironment.port, RoleEnvironment.url,repository, RoleEnvironment.clientId,RoleEnvironment.clientSecret);
         restHookTestApi.start();
@@ -36,7 +36,7 @@ public class Startup implements SparkApplication{
             url= System.getenv("WEBSITE_SITE_NAME");
         }
 
-        repository=new AzureRestHookRepository(RoleEnvironment.azureStorageConnectionString,url);
+        repository=new AzureRestHookRepository(RoleEnvironment.azureStorageConnectionString,url,logs);
         repository.initialize(logs,messages);
 
         restHookTestApi = new RESTHookTestApi(port, url,repository,RoleEnvironment.clientId,RoleEnvironment.clientSecret);

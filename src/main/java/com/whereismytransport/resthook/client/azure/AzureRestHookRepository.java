@@ -22,13 +22,13 @@ import java.util.List;
 public class AzureRestHookRepository implements RestHookRepository {
 
     protected CloudTableClient tableClient;
-    protected CloudTable table;
 
     private final static String tableName = "JavaTestClientTable";
     private final String storageConnectionString;
+    private List<String> logs;
     private final String clientBaseUrl;
 
-    public AzureRestHookRepository(String storageConnectionString, String clientBaseUrl){
+    public AzureRestHookRepository(String storageConnectionString, String clientBaseUrl,List<String> logs){
         this.storageConnectionString=storageConnectionString;
         this.clientBaseUrl=clientBaseUrl;
     }
@@ -45,7 +45,9 @@ public class AzureRestHookRepository implements RestHookRepository {
             getTable();
                 return true;
         } catch (StorageException | InvalidKeyException | URISyntaxException e) {
-            logs.add(e.getStackTrace().toString());
+            for (StackTraceElement stackElement:e.getStackTrace()) {
+                logs.add(stackElement.toString());
+            }
             return false;
         }
     }
@@ -57,6 +59,9 @@ public class AzureRestHookRepository implements RestHookRepository {
             getTable().execute(TableOperation.insertOrReplace(entity));
             return true;
         } catch (StorageException|URISyntaxException  e) {
+            for (StackTraceElement stackElement:e.getStackTrace()) {
+                logs.add(stackElement.toString());
+            }
             e.printStackTrace();
             return false;
         }
@@ -73,6 +78,9 @@ public class AzureRestHookRepository implements RestHookRepository {
                     results.add(new RestHook(result.serverUrl,result.relativeServerUrl, result.secret,result.index,this.clientBaseUrl));
             }
         } catch (URISyntaxException | StorageException e) {
+            for (StackTraceElement stackElement:e.getStackTrace()) {
+                logs.add(stackElement.toString());
+            }
             e.printStackTrace();
         }
         return results;

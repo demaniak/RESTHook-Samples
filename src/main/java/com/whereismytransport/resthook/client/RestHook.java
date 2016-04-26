@@ -79,8 +79,10 @@ public class RestHook {
                     res.body(responseMessage);
                 }
             } catch (Exception e) {
+                for (StackTraceElement stackElement:e.getStackTrace()) {
+                    logs.add(stackElement.toString());
+                }
                 String responseMessage = "Exception occurred encoding hash: " + e.getStackTrace().toString();
-                logs.add(responseMessage);
                 res.status(500); //Internal server error
                 return res;
             }
@@ -120,8 +122,10 @@ public class RestHook {
                     logs.add("Couldn't get token. Response Code:" +tokenResponse.code()+", Message: "+tokenResponse.message());
                 }
             }catch (Exception e) {
-                e.printStackTrace();
-                logs.add(e.getStackTrace().toString());
+                e.getStackTrace();
+                for (StackTraceElement stackElement:e.getStackTrace()) {
+                    logs.add(stackElement.toString());
+                }
             }
             return false;
         }

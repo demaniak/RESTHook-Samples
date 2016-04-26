@@ -95,6 +95,9 @@ public class RESTHookTestApi {
                 }
             }
             catch(Exception e){
+                for (StackTraceElement stackElement:e.getStackTrace()) {
+                    logs.add(stackElement.toString());
+                }
                 res.status(500);
                 res.body("Couldn't create WebHook");
             }
