@@ -3,6 +3,8 @@ import com.whereismytransport.resthook.client.RestHookRepository;
 import com.whereismytransport.resthook.client.azure.AzureRestHookRepository;
 import spark.servlet.SparkApplication;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 
 public class Startup implements SparkApplication{
@@ -34,6 +36,8 @@ public class Startup implements SparkApplication{
         String url=RoleEnvironment.url;
         if(System.getenv().containsKey("WEBSITE_SITE_NAME")){
             url= System.getenv("WEBSITE_SITE_NAME");
+            logs.add(url);
+
         }
 
         repository=new AzureRestHookRepository(RoleEnvironment.azureStorageConnectionString,url,logs);
