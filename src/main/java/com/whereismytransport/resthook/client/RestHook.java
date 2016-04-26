@@ -59,15 +59,15 @@ public class RestHook {
     }
 
     public spark.Response handleHookMessage(Request req, spark.Response res, List<String> messages,List<String> logs) {
-        if(req.headers().contains("X-Hook-Secret")){
+        if(req.headers().contains("x-hook-secret")){
             res.status(200);
-            secret=req.headers("X-Hook-Secret");
-            res.header("X-Hook-Secret",secret);
+            secret=req.headers("x-hook-secret");
+            res.header("x-hook-secret",secret);
             return res;
         }
-        else if (req.headers().contains("X-Hook-Signature")) {
+        else if (req.headers().contains("x-hook-signature")) {
             String body = req.body();
-            String xHookSignature = req.headers("X-Hook-Signature");
+            String xHookSignature = req.headers("x-hook-signature");
             messages.add(req.body());
             try {
                 if (HmacUtilities.validBody(this, body, xHookSignature)) {
