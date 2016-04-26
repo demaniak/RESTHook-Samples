@@ -26,17 +26,15 @@ public class AzureRestHookRepository implements RestHookRepository {
 
     private final static String tableName = "JavaTestClientTable";
     private final String storageConnectionString;
-    private List<String> logs;
-    private List<String> restHookBodies;
+    private final String clientBaseUrl;
 
-    public AzureRestHookRepository(String storageConnectionString){
+    public AzureRestHookRepository(String storageConnectionString, String clientBaseUrl){
         this.storageConnectionString=storageConnectionString;
+        this.clientBaseUrl=clientBaseUrl;
     }
 
     public boolean initialize(List<String> logs, List<String> restHookBodies){
-        this.logs=logs;
-        this.restHookBodies=restHookBodies;
-        try {
+            try {
             CloudStorageAccount account = CloudStorageAccount.parse(storageConnectionString);
             tableClient=account.createCloudTableClient();
             table=tableClient.getTableReference(tableName);
@@ -49,9 +47,9 @@ public class AzureRestHookRepository implements RestHookRepository {
     }
 
     @Override
-    public boolean addRestHook(String relativeCallbackUrl, String secret, String serverUrl, String relativeServerUrl) {
+    public boolean addOrReplaceRestHook(RestHook hook) {
         try {
-            RestHookTableEntity entity = new RestHookTableEntity(relativeCallbackUrl, secret, serverUrl, relativeServerUrl);
+            RestHookTableEntity entity = new RestHookTableEntity(hook.index,hook.secret, hook.serverUrl, hook.serverRelativeUrl);
             table.execute(TableOperation.insertOrReplace(entity));
             return true;
         } catch (StorageException e) {
@@ -67,7 +65,7 @@ public class AzureRestHookRepository implements RestHookRepository {
         ResultContinuation continuationToken = new ResultContinuation();
         ArrayList<RestHook> results=new ArrayList<>();
         for(RestHookTableEntity result:table.execute(query)){
-                results.add(new RestHook(result.serverUrl,result.relativeServerUrl, logs,restHookBodies,result.secret));
+                results.add(new RestHook(result.serverUrl,result.relativeServerUrl, result.secret,result.index,this.clientBaseUrl));
         }
         return results;
     }

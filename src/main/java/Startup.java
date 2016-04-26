@@ -6,22 +6,15 @@ import spark.servlet.SparkApplication;
 import java.util.ArrayList;
 
 public class Startup implements SparkApplication{
+
     private static RestHookRepository repository;
     private static RESTHookTestApi restHookTestApi;
     private static ArrayList<String> logs= new ArrayList<>();
     private static ArrayList<String> messages=new ArrayList<> ();
     public static void main(String [] args){
-        String url="http://localhost:4567/";
-        int port=4567;
-        String connectionString="UseDevelopmentStorage=true";
-        if(args.length==3){
-            port=Integer.parseInt(args[0]);
-            url=args[1];
-            connectionString=args[2];
-        }
-        repository=new AzureRestHookRepository(RoleEnvironment.azureStorageConnectionString);
+        repository=new AzureRestHookRepository(RoleEnvironment.azureStorageConnectionString,RoleEnvironment.url);
         repository.initialize(logs,messages);
-        restHookTestApi = new RESTHookTestApi(Integer.parseInt(args[0]), "http://localhost:4567/",repository, RoleEnvironment.clientId,RoleEnvironment.clientSecret);
+        restHookTestApi = new RESTHookTestApi(RoleEnvironment.port, RoleEnvironment.url,repository, RoleEnvironment.clientId,RoleEnvironment.clientSecret);
         restHookTestApi.start();
     }
 
@@ -30,19 +23,21 @@ public class Startup implements SparkApplication{
     // Method automatically called by Java Host (e.g. Jetty or Tomcat)
     @Override
     public void init() {
-        repository=new AzureRestHookRepository(RoleEnvironment.azureStorageConnectionString);
-        repository.initialize(logs,messages);
-        int port=0;
+
+        int port=RoleEnvironment.port;
 
         if(System.getenv().containsKey("HTTP_PLATFORM_PORT")){
             port = Integer.parseInt(System.getenv("HTTP_PLATFORM_PORT"));
         }else{
-            port = Integer.parseInt(RoleEnvironment.port);
+            port = RoleEnvironment.port;
         }
         String url=RoleEnvironment.url;
         if(System.getenv().containsKey("WEBSITE_SITE_NAME")){
             url= System.getenv("WEBSITE_SITE_NAME");
         }
+
+        repository=new AzureRestHookRepository(RoleEnvironment.azureStorageConnectionString,url);
+        repository.initialize(logs,messages);
 
         restHookTestApi = new RESTHookTestApi(port, url,repository,RoleEnvironment.clientId,RoleEnvironment.clientSecret);
         restHookTestApi.start();

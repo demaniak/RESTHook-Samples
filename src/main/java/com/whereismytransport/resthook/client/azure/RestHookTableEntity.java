@@ -4,6 +4,7 @@ import com.microsoft.azure.storage.table.TableServiceEntity;
 import java.net.URLEncoder;
 
 import java.io.UnsupportedEncodingException;
+import java.util.UUID;
 
 /**
  * Created by Nick Cuthbert on 25/04/2016.
@@ -13,18 +14,30 @@ public class RestHookTableEntity extends TableServiceEntity {
     public static final String restHookPartitionKey ="ClientSecrets";
     public String secret;
     public String serverUrl;
-    public String relativeCallbackUrl;
+
+    public UUID getIndex() {
+        return index;
+    }
+
+    public void setIndex(UUID index) {
+        this.index = index;
+    }
+
+    public static String getRestHookPartitionKey() {
+        return restHookPartitionKey;
+    }
+
+    public UUID index;
     public String relativeServerUrl;
 
     public RestHookTableEntity(){}
 
-    public RestHookTableEntity(String relativeCallbackUrl, String secret, String serverUrl, String relativeServerUrl){
+    public RestHookTableEntity(UUID index, String secret, String serverUrl, String relativeServerUrl){
         this.secret = secret;
         this.serverUrl = serverUrl;
         this.relativeServerUrl = relativeServerUrl;
-        this.relativeCallbackUrl=relativeCallbackUrl;
         this.partitionKey=RestHookTableEntity.restHookPartitionKey;
-
+        this.index=index;
         try {
             this.rowKey= URLEncoder.encode(serverUrl+relativeServerUrl,"UTF-8");
         } catch (UnsupportedEncodingException e) {
@@ -56,15 +69,5 @@ public class RestHookTableEntity extends TableServiceEntity {
 
     public void setRelativeServerUrl(String relativeServerUrl) {
         this.relativeServerUrl = relativeServerUrl;
-    }
-
-
-
-    public String getRelativeCallbackUrl() {
-        return relativeCallbackUrl;
-    }
-
-    public void setRelativeCallbackUrl(String relativeCallbackUrl) {
-        this.relativeCallbackUrl = relativeCallbackUrl;
     }
 }

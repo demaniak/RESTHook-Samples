@@ -6,5 +6,5 @@ public class RoleEnvironment {
     public static final String clientId="{{ClientId}}";
     public static final String clientSecret="{{ClientSecret}}";
     public static String url="{{Url}}";
-    public static String port="{{Port}}";
+    public static int port={{Port}};
 }

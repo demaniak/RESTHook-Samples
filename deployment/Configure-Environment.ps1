@@ -9,14 +9,21 @@ Param(
 	[string]$clientSecret,
       
     [Parameter(Mandatory=$true)]
+	[string]$configTemplate,
+    
+    [Parameter(Mandatory=$true)]
 	[string]$configFile,
+            
+	[int]$Port=4567,
+    
+    [string]$Url="http://localhost:4567/",
             
 	[bool]$simulated
 )
 
 Import-Module $PSScriptRoot\Merge-Tokens.psm1
 
-$content=(Get-Content $configFile | Merge-Tokens -tokens @{'AzureStorageConnectionString'=$connectionString; 'ClientId'=$clientId; 'ClientSecret'=$clientSecret; 'Url'=''; 'Port'='' });
+$content=(Get-Content $configTemplate | Merge-Tokens -tokens @{'AzureStorageConnectionString'=$connectionString; 'ClientId'=$clientId; 'ClientSecret'=$clientSecret; 'Url'=$Url; 'Port'=$Port });
 
 if($simulated){
     Write-Output $content;
