@@ -62,7 +62,7 @@ public class RestHook {
         if(req.headers().contains("x-hook-secret")){
             res.status(200);
             secret=req.headers("x-hook-secret");
-            res.header("x-hook-secret",secret);
+            res.header("X-Hook-Secret",secret);
             return res;
         }
         else if (req.headers().contains("x-hook-signature")) {
