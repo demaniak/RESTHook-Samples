@@ -35,9 +35,8 @@ public class Startup implements SparkApplication{
         }
         String url=RoleEnvironment.url;
         if(System.getenv().containsKey("WEBSITE_SITE_NAME")){
-            url= System.getenv("WEBSITE_SITE_NAME");
+            url= RoleEnvironment.protocol+"://"+System.getenv("WEBSITE_SITE_NAME")+"/";
             logs.add(url);
-
         }
 
         repository=new AzureRestHookRepository(RoleEnvironment.azureStorageConnectionString,url,logs);
