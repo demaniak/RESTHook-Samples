@@ -32,14 +32,18 @@ public class AzureRestHookRepository implements RestHookRepository {
         this.storageConnectionString=storageConnectionString;
         this.clientBaseUrl=clientBaseUrl;
     }
+    private CloudTable getTable() throws URISyntaxException, StorageException {
 
+        CloudTable tableReference = tableClient.getTableReference(tableName);
+        tableReference .createIfNotExists();
+        return tableReference;
+    }
     public boolean initialize(List<String> logs, List<String> restHookBodies){
-            try {
+        try {
             CloudStorageAccount account = CloudStorageAccount.parse(storageConnectionString);
             tableClient=account.createCloudTableClient();
-            table=tableClient.getTableReference(tableName);
-            table.createIfNotExists();
-            return true;
+            getTable();
+                return true;
         } catch (StorageException | InvalidKeyException | URISyntaxException e) {
             logs.add(e.getStackTrace().toString());
             return false;
@@ -50,9 +54,9 @@ public class AzureRestHookRepository implements RestHookRepository {
     public boolean addOrReplaceRestHook(RestHook hook) {
         try {
             RestHookTableEntity entity = new RestHookTableEntity(hook.index,hook.secret, hook.serverUrl, hook.serverRelativeUrl);
-            table.execute(TableOperation.insertOrReplace(entity));
+            getTable().execute(TableOperation.insertOrReplace(entity));
             return true;
-        } catch (StorageException e) {
+        } catch (StorageException|URISyntaxException  e) {
             e.printStackTrace();
             return false;
         }
@@ -62,10 +66,14 @@ public class AzureRestHookRepository implements RestHookRepository {
     public List<RestHook> getRestHooks() {
         String partitionFilter= TableQuery.generateFilterCondition("PartitionKey", TableQuery.QueryComparisons.EQUAL,RestHookTableEntity.restHookPartitionKey);
         TableQuery<RestHookTableEntity> query=TableQuery.from(RestHookTableEntity.class).where(partitionFilter);
-        ResultContinuation continuationToken = new ResultContinuation();
+
         ArrayList<RestHook> results=new ArrayList<>();
-        for(RestHookTableEntity result:table.execute(query)){
-                results.add(new RestHook(result.serverUrl,result.relativeServerUrl, result.secret,result.index,this.clientBaseUrl));
+        try {
+            for(RestHookTableEntity result:getTable().execute(query)){
+                    results.add(new RestHook(result.serverUrl,result.relativeServerUrl, result.secret,result.index,this.clientBaseUrl));
+            }
+        } catch (URISyntaxException | StorageException e) {
+            e.printStackTrace();
         }
         return results;
     }
