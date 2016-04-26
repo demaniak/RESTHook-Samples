@@ -108,14 +108,15 @@ public class RestHook {
                     Call createHookCall = restHookService.createRestHook(serverRelativeUrl,
                                                                          new RESTHookRequest(clientUrl + relativeCallbackUrl, "Test Webhook"),
                                                                          "Bearer " + token.access_token);
-
+                    okhttp3.Request build = createHookCall.request().newBuilder().build();
+                    logs.add("Url:" +build.url());
                     Response createHookCallResponse = createHookCall.execute();
                     if(createHookCallResponse.isSuccessful()) {
                         logs.add("Successfully created web hook");
                         return true;
                     }else {
                         logs.add("Something went wrong calling web hook setup. Response code: " + createHookCallResponse.code()+
-                                ", Message"+createHookCallResponse.message()+", Body"+createHookCallResponse.body()
+                                ", Message"+createHookCallResponse.message()+", Body"+createHookCallResponse.body()+", Error Body: "+createHookCallResponse.errorBody().string()
                         );
                     }
                 }else {
