@@ -31,6 +31,7 @@ public class AzureRestHookRepository implements RestHookRepository {
     public AzureRestHookRepository(String storageConnectionString, String clientBaseUrl,List<String> logs){
         this.storageConnectionString=storageConnectionString;
         this.clientBaseUrl=clientBaseUrl;
+        this.logs=logs;
     }
     private CloudTable getTable() throws URISyntaxException, StorageException {
 

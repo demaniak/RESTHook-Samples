@@ -63,6 +63,8 @@ public class RESTHookTestApi {
         });
 
         post("/hooks/:id", (req, res) -> {
+            logs.add(req.body());
+            logs.add(listToMultilineString(req.headers().stream().map(x->x).collect(Collectors.toList())));
             UUID id=UUID.fromString(req.params(":id"));
             return hooks.get(id).handleHookMessage(req,res,messages,logs);
         });

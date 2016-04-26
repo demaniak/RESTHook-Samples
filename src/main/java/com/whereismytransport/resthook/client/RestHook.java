@@ -115,7 +115,7 @@ public class RestHook {
                         return true;
                     }else {
                         logs.add("Something went wrong calling web hook setup. Response code: " + createHookCallResponse.code()+
-                                ", Message"+createHookCallResponse.message()+", Body"+createHookCallResponse.errorBody()
+                                ", Message"+createHookCallResponse.message()+", Body"+createHookCallResponse.body()
                         );
                     }
                 }else {
