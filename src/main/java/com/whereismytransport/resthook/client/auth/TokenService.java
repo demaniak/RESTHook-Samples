@@ -20,7 +20,7 @@ public interface TokenService {
     Call<Token> createToken(@FieldMap Map<String,String> clientCredentials);
 
     public static final Retrofit retrofit = new Retrofit.Builder()
-            .baseUrl("https://identity.whereismytransport.com/api/")
+            .baseUrl("https://identity.whereismytransport.com/")
             .addConverterFactory(GsonConverterFactory.create())
             .build();
 }
