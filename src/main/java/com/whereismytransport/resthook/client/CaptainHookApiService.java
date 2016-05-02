@@ -14,5 +14,5 @@ public interface CaptainHookApiService {
      * Note that only users with the scope webhook:global may create global scopes
      */
     @POST("{creationPath}")
-    Call<ResponseBody> createRestHook(@Path(value = "creationPath",encoded = true) String creationPath, @Body RESTHookRequest hook, @Header("Authorization") String authorization);
+    Call<ResponseBody> createRestHook(@Url String creationPath, @Body RESTHookRequest hook, @Header("Authorization") String authorization);
 }
