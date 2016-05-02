@@ -39,7 +39,7 @@ public class RestHook {
         this.index=UUID.randomUUID();
 
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(serverUrl)
+                .baseUrl()
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
         restHookService = retrofit.create(CaptainHookApiService.class);
