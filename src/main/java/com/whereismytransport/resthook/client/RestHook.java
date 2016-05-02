@@ -105,6 +105,8 @@ public class RestHook {
 
                 if (tokenResponse.isSuccessful()) {
                     Token token = tokenResponse.body();
+                    logs.add("Input url:" +clientUrl + relativeCallbackUrl);
+                    logs.add("Token: " +token.AccessToken);
                     Call createHookCall = restHookService.createRestHook(serverRelativeUrl,
                                                                          new RESTHookRequest(clientUrl + relativeCallbackUrl, "Test Webhook"),
                                                                          "Bearer " + token.access_token);
