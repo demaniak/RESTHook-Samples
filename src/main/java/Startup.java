@@ -1,26 +1,20 @@
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
+import com.whereismytransport.resthook.client.RESTHookTestApi;
+import com.whereismytransport.resthook.client.RestHookRepository;
+import com.whereismytransport.resthook.client.azure.AzureRestHookRepository;
+import spark.servlet.SparkApplication;
 
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
-import javax.xml.bind.DatatypeConverter;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 
-import static spark.Spark.get;
-import static spark.Spark.post;
+public class Startup implements SparkApplication{
 
-public class Startup {
-
-    // Create retrofit rest client for CaptainHook
-    public static CaptainHookApiService service = CaptainHookApiService.retrofit.create(CaptainHookApiService.class);
-    public static TokenService tokenService = TokenService.retrofit.create(TokenService.class);
-
-    public static byte[] Secret ={};
-    static ArrayList<String> alerts = new ArrayList();
-    static ArrayList<String> logs = new ArrayList();
-
+    private static RestHookRepository repository;
+    private static RESTHookTestApi restHookTestApi;
+    private static ArrayList<String> logs= new ArrayList<>();
+    private static ArrayList<String> messages=new ArrayList<> ();
     public static void main(String [] args){
+<<<<<<< HEAD
 
 
         System.out.println("Startup class loaded.");
@@ -80,59 +74,34 @@ public class Startup {
 
         // this could be in a post create webhook call
         createAlertWebHook();
+=======
+        repository=new AzureRestHookRepository(RoleEnvironment.azureStorageConnectionString,RoleEnvironment.url,logs);
+        repository.initialize(logs,messages);
+        restHookTestApi = new RESTHookTestApi(RoleEnvironment.port, RoleEnvironment.url,repository, RoleEnvironment.clientId,RoleEnvironment.clientSecret,logs,messages);
+        restHookTestApi.start();
+>>>>>>> 72f95e11aa458af541807d755ec91545a11c16d8
     }
 
-    private static void createAlertWebHook() {
-        // Tell CaptainHook that we want to subscribe to Alerts
-        Call getTokenCall=tokenService.createToken(new ClientCredentials("transitapi_prod_postman_client","wimt85!").getMap());
-        getTokenCall.enqueue(new Callback() {
-            @Override
-            public void onResponse(Call call, Response response) {
-                System.out.println(response.code());
-                Call createHookCall =  service.createHook(new Hook("http://localhost:4567/hooks/alerts", "Alerts webhook"),"Bearer "+((Token)response.body()).access_token);
-                createHookCall.enqueue(new Callback() {
-                    @Override
-                    public void onResponse(Call call, Response response2) {
-                        if(response2.isSuccessful()) {
-                            System.out.println("Created Hook Successfully");
-                            logs.add("Created Hook Successfully");
-                        }
-                        else {
-                            System.out.println(response.message());
-                            System.out.println("Something went wrong calling webhook setup. Response code: " + response2.code());
-                            logs.add("Something went wrong calling webhook setup. Response code: " + response2.code());
-                        }
-                    }
-
-                    @Override
-                    public void onFailure(Call call, Throwable t) {
-                        if(t.getCause() == null) {
-                            logs.add("CreateHookCall onFailure called.");
-                        } else {
-                            logs.add(t.getCause().toString());
-                            logs.add(t.getCause().getLocalizedMessage());
-                            logs.add("Error occurred in calling Captain Hook.");
-                        }
-                    }
-                });
-            }
-
-            @Override
-            public void onFailure(Call call, Throwable t) {
-
-            }
-        });
 
 
+    // Method automatically called by Java Host (e.g. Jetty or Tomcat)
+    @Override
+    public void init() {
 
+        int port=RoleEnvironment.port;
 
+        if(System.getenv().containsKey("HTTP_PLATFORM_PORT")){
+            port = Integer.parseInt(System.getenv("HTTP_PLATFORM_PORT"));
+        }else{
+            port = RoleEnvironment.port;
+        }
+        String url=RoleEnvironment.url;
+        
+        repository=new AzureRestHookRepository(RoleEnvironment.azureStorageConnectionString,url,logs);
+        repository.initialize(logs,messages);
 
+        restHookTestApi = new RESTHookTestApi(port, url,repository,RoleEnvironment.clientId,RoleEnvironment.clientSecret,logs,messages);
+        restHookTestApi.start();
     }
 
-    private static String encode(byte[] key, byte[] data) throws Exception {
-        Mac sha256_HMAC = Mac.getInstance("HmacSHA256");
-        SecretKeySpec secret_key = new SecretKeySpec(key, sha256_HMAC.getAlgorithm());
-        sha256_HMAC.init(secret_key);
-        return DatatypeConverter.printBase64Binary(sha256_HMAC.doFinal(data));
-    }
 }

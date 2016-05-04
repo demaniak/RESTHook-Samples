@@ -1,3 +1,5 @@
+package com.whereismytransport.resthook.client.auth;
+
 /**
  * Created by Henk on 2016/04/21.
  */
