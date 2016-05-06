@@ -8,7 +8,7 @@ import java.util.Map;
  */
 public class ClientCredentials {
     public String grant_type="client_credentials";
-    public String scope="TransitApi";
+    public String scope="transitapi:all";
 
     public String client_id;
     public String client_secret;
