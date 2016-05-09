@@ -37,11 +37,6 @@ public class RestHook {
         this.clientUrl=clientUrl;
         this.serverRelativeUrl = serverRelativeUrl;
         this.index=UUID.randomUUID();
-
-        // Retrofit retrofit = new Retrofit.Builder()
-        //         .baseUrl("http://api.myservice.com/")
-        //         .addConverterFactory(GsonConverterFactory.create())
-        //         .build();
         restHookService = CaptainHookApiService.retrofit.create(CaptainHookApiService.class);
     }
 
