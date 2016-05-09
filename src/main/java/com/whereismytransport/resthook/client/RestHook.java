@@ -107,10 +107,10 @@ public class RestHook {
                     Token token = tokenResponse.body();
                     logs.add("Input url: " +serverUrl+serverRelativeUrl);
                     logs.add("Token: " +token.access_token);
-                    Call createHookCall = restHookService.createRestHook(serverUrl+serverRelativeUrl,
+                    Call<ResponseBody> createHookCall = restHookService.createRestHook(serverUrl+serverRelativeUrl,
                                                                          new RESTHookRequest(clientUrl + relativeCallbackUrl, "Test Webhook"),
                                                                          "Bearer " + token.access_token);
-                    okhttp3.Request build = createHookCall.request().newBuilder().build();
+                    //okhttp3.Request build = createHookCall.request().newBuilder().build();
                     logs.add("Url:" +build.url());
                     Response createHookCallResponse = createHookCall.execute();
                     if(createHookCallResponse.isSuccessful()) {
