@@ -9,7 +9,7 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import spark.Request;
 
-
+import okhttp3.ResponseBody;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
@@ -56,6 +56,7 @@ public class RestHook {
         this.secret=secret;
         this.index=index;
         this.clientUrl=clientUrl;
+        restHookService = CaptainHookApiService.retrofit.create(CaptainHookApiService.class);
     }
 
     public spark.Response handleHookMessage(Request req, spark.Response res, List<String> messages,List<String> logs) {
@@ -111,8 +112,8 @@ public class RestHook {
                                                                          new RESTHookRequest(clientUrl + relativeCallbackUrl, "Test Webhook"),
                                                                          "Bearer " + token.access_token);
                     //okhttp3.Request build = createHookCall.request().newBuilder().build();
-                    logs.add("Url:" +build.url());
-                    Response createHookCallResponse = createHookCall.execute();
+                    //logs.add("Url:" +build.url());
+                    Response<ResponseBody> createHookCallResponse = createHookCall.execute();
                     if(createHookCallResponse.isSuccessful()) {
                         logs.add("Successfully created web hook");
                         return true;
