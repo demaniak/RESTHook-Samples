@@ -15,4 +15,9 @@ public interface CaptainHookApiService {
      */
     @POST
     Call<ResponseBody> createRestHook(@Url String creationPath, @Body RESTHookRequest hook, @Header("Authorization") String authorization);
+    
+    public static final Retrofit retrofit = new Retrofit.Builder()
+        .baseUrl("https://identity.whereismytransport.com/")
+        .addConverterFactory(GsonConverterFactory.create())
+        .build();
 }
