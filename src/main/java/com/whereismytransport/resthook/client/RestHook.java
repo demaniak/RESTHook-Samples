@@ -21,7 +21,7 @@ import static spark.Spark.post;
  */
 public class RestHook {
     private TokenService tokenService = TokenService.retrofit.create(TokenService.class);
-    private CaptainHookApiService restHookService;
+    private CaptainHookApiService restHookService = CaptainHookApiService.retrofit.create(CaptainHookApiService.class);
     private String clientUrl;
     public String serverUrl;
     public String serverRelativeUrl;
@@ -37,7 +37,6 @@ public class RestHook {
         this.clientUrl=clientUrl;
         this.serverRelativeUrl = serverRelativeUrl;
         this.index=UUID.randomUUID();
-        restHookService = CaptainHookApiService.retrofit.create(CaptainHookApiService.class);
     }
 
     public RestHook(String serverUrl,
@@ -51,7 +50,6 @@ public class RestHook {
         this.secret=secret;
         this.index=index;
         this.clientUrl=clientUrl;
-        restHookService = CaptainHookApiService.retrofit.create(CaptainHookApiService.class);
     }
 
     public spark.Response handleHookMessage(Request req, spark.Response res, List<String> messages,List<String> logs) {
@@ -106,8 +104,6 @@ public class RestHook {
                     Call<ResponseBody> createHookCall = restHookService.createRestHook(serverUrl+serverRelativeUrl,
                                                                          new RESTHookRequest(clientUrl + relativeCallbackUrl, "Test Webhook"),
                                                                          "Bearer " + token.access_token);
-                    //okhttp3.Request build = createHookCall.request().newBuilder().build();
-                    //logs.add("Url:" +build.url());
                     Response<ResponseBody> createHookCallResponse = createHookCall.execute();
                     if(createHookCallResponse.isSuccessful()) {
                         logs.add("Successfully created web hook");
