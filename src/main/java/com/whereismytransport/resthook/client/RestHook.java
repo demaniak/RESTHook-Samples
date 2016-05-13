@@ -5,13 +5,10 @@ import com.whereismytransport.resthook.client.auth.Token;
 import com.whereismytransport.resthook.client.auth.TokenService;
 import retrofit2.Call;
 import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 import spark.Request;
 
 import okhttp3.ResponseBody;
 import java.util.List;
-import java.util.Random;
 import java.util.UUID;
 
 import static spark.Spark.post;
@@ -89,9 +86,11 @@ public class RestHook {
         return res;
     }
 
-    public boolean createHook(ClientCredentials clientCredentials,List<String> logs) {
+    public boolean createHook(RestHookRetrofitRequest request, ClientCredentials clientCredentials, List<String> logs) {
         try {
                 String relativeCallbackUrl = "hooks/" +index ;
+                request.callbackUrl=clientUrl + relativeCallbackUrl;
+
                 // Get token to connect to CaptainHook
                 Call<Token> getTokenCall = tokenService.createToken(clientCredentials.getMap());
 
@@ -102,8 +101,7 @@ public class RestHook {
                     logs.add("Input url: " +serverUrl+serverRelativeUrl);
                     logs.add("Token: " +token.access_token);
                     Call<ResponseBody> createHookCall = restHookService.createRestHook(serverUrl+serverRelativeUrl,
-                                                                         new RESTHookRequest(clientUrl + relativeCallbackUrl, "Test Webhook"),
-                                                                         "Bearer " + token.access_token);
+                                                                                       request, "Bearer " + token.access_token);
                     Response<ResponseBody> createHookCallResponse = createHookCall.execute();
                     if(createHookCallResponse.isSuccessful()) {
                         logs.add("Successfully created web hook");

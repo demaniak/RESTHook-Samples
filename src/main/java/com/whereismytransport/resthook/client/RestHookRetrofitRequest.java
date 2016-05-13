@@ -6,20 +6,16 @@ package com.whereismytransport.resthook.client;
  * requests
  * */
 
-public class RESTHookRequest {
+public class RestHookRetrofitRequest {
 
     public String callbackUrl;
     public String description;
 
 
     /**
-     *
-     * @param callbackUrl The callbackUrl represent the address on *THIS* server at which
-     *                    post requests must be made for this hook
      * @param description A human readable description of what this hook is for (e.g. "Post to Twitter")
      */
-    public RESTHookRequest(String callbackUrl, String description) {
-        this.callbackUrl = callbackUrl;
+    public RestHookRetrofitRequest(String description) {
         this.description = description;
     }
 }

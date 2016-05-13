@@ -1,22 +1,20 @@
-import com.whereismytransport.resthook.client.RESTHookTestApi;
+import com.whereismytransport.resthook.client.RestHookTestApi;
 import com.whereismytransport.resthook.client.RestHookRepository;
 import com.whereismytransport.resthook.client.azure.AzureRestHookRepository;
 import spark.servlet.SparkApplication;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 
 public class Startup implements SparkApplication{
 
     private static RestHookRepository repository;
-    private static RESTHookTestApi restHookTestApi;
+    private static RestHookTestApi restHookTestApi;
     private static ArrayList<String> logs= new ArrayList<>();
     private static ArrayList<String> messages=new ArrayList<> ();
     public static void main(String [] args){
         repository=new AzureRestHookRepository(RoleEnvironment.azureStorageConnectionString,RoleEnvironment.url,logs);
         repository.initialize(logs,messages);
-        restHookTestApi = new RESTHookTestApi(RoleEnvironment.port, RoleEnvironment.url,repository, RoleEnvironment.clientId,RoleEnvironment.clientSecret,logs,messages);
+        restHookTestApi = new RestHookTestApi(RoleEnvironment.port, RoleEnvironment.url,repository, RoleEnvironment.clientId,RoleEnvironment.clientSecret,logs,messages);
         restHookTestApi.start();
     }
 
@@ -38,7 +36,7 @@ public class Startup implements SparkApplication{
         repository=new AzureRestHookRepository(RoleEnvironment.azureStorageConnectionString,url,logs);
         repository.initialize(logs,messages);
 
-        restHookTestApi = new RESTHookTestApi(port, url,repository,RoleEnvironment.clientId,RoleEnvironment.clientSecret,logs,messages);
+        restHookTestApi = new RestHookTestApi(port, url,repository,RoleEnvironment.clientId,RoleEnvironment.clientSecret,logs,messages);
         restHookTestApi.start();
     }
 

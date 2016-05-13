@@ -1,8 +1,8 @@
 package com.whereismytransport.resthook.client;
 
 import com.whereismytransport.resthook.client.auth.ClientCredentials;
-import okio.Okio;
-import retrofit2.http.Url;
+import spark.Request;
+import spark.Response;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -19,7 +19,7 @@ import static spark.Spark.*;
  * allows users to create new RESTHooks. This would generally be done at startup. But this
  * sample was created for demonstrative and testing purposes.
  */
-public class RESTHookTestApi {
+public class RestHookTestApi {
 
     private List<String> receivedWebhookBodies = new ArrayList<>();
     private List<String> logs;
@@ -31,7 +31,7 @@ public class RESTHookTestApi {
     private int port;
     private String baseUrl;
 
-    public RESTHookTestApi(int port, String baseUrl, RestHookRepository restHookRepository,String clientId, String clientSecret,List<String> logs,List<String> messages){
+    public RestHookTestApi(int port, String baseUrl, RestHookRepository restHookRepository, String clientId, String clientSecret, List<String> logs, List<String> messages){
         this.logs=logs;
         this.messages=messages;
         this.restHookRepository=restHookRepository;
@@ -70,42 +70,53 @@ public class RESTHookTestApi {
         });
 
         //Instruct client to create a RESThook at the address given as a UTF-8 encoded string in the body.
-        post("/start", (req,res) -> {
-            try {
-                URL target = new URL(req.body());
-                String host=target.getProtocol()+"://"+target.getAuthority()+"/";
-                String path=target.getFile().substring(1);
-                RestHook hook=null;
-                for (UUID hookKey:hooks.keySet()) {
-                    RestHook restHook = hooks.get(hookKey);
-                    if(restHook.serverUrl.equals(host) && restHook.serverRelativeUrl.equals(path)){
-                        hook=restHook;
-                    }
-                }
-
-                if(hook==null){
-                    hook= new RestHook(host,path,baseUrl);
-                    hooks.put(hook.index, hook);
-                }
-
-                if(hook.createHook(clientCredentials,logs)){
-                    restHookRepository.addOrReplaceRestHook(hook);
-                    res.status(200);
-                    res.body("Webhook Created with path");
-                }else{
-                    res.status(500);
-                    res.body("Couldn't create webhook");
-                }
-            }
-            catch(Exception e){
-                for (StackTraceElement stackElement:e.getStackTrace()) {
-                    logs.add(stackElement.toString());
-                }
-                res.status(500);
-                res.body("Couldn't create WebHook");
-            }
+        post("/webhook", (req,res) -> {
+            processHook(new RestHookRetrofitRequest("Test Hook"),req,res);
             return res.body();
         });
+
+        post("/channelwebhook", (req,res) -> {
+            ChannelWebhookRequestBody body=JsonDeserializer.convert(req.body(), ChannelWebhookRequestBody.class, logs);
+            processHook(new ChannelRestHookRetrofitRequest("Test Hook",body.targetUrl,body.channelName,body.characterLimit),req,res);
+            return res.body();
+        });
+    }
+
+    private spark.Response processHook(RestHookRetrofitRequest webhookBody, Request req, spark.Response res){
+        try {
+            URL target = new URL(req.body());
+            String host=target.getProtocol()+"://"+target.getAuthority()+"/";
+            String path=target.getFile().substring(1);
+            RestHook hook=null;
+            for (UUID hookKey:hooks.keySet()) {
+                RestHook restHook = hooks.get(hookKey);
+                if(restHook.serverUrl.equals(host) && restHook.serverRelativeUrl.equals(path)){
+                    hook=restHook;
+                }
+            }
+
+            if(hook==null){
+                hook= new RestHook(host,path,baseUrl);
+                hooks.put(hook.index, hook);
+            }
+
+            if(hook.createHook(webhookBody,clientCredentials,logs)){
+                restHookRepository.addOrReplaceRestHook(hook);
+                res.status(200);
+                res.body("Webhook Created with path");
+            }else{
+                res.status(500);
+                res.body("Couldn't create webhook");
+            }
+        }
+        catch(Exception e){
+            for (StackTraceElement stackElement:e.getStackTrace()) {
+                logs.add(stackElement.toString());
+            }
+            res.status(500);
+            res.body("Couldn't create WebHook");
+        }
+        return res;
     }
 
     private static String listToMultilineString(List<String> list){

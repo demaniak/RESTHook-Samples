@@ -16,7 +16,7 @@ public interface CaptainHookApiService {
      * Note that only users with the scope webhook:global may create global scopes
      */
     @POST
-    Call<ResponseBody> createRestHook(@Url String creationPath, @Body RESTHookRequest hook, @Header("Authorization") String authorization);
+    Call<ResponseBody> createRestHook(@Url String creationPath, @Body RestHookRetrofitRequest hook, @Header("Authorization") String authorization);
     
     public static final Retrofit retrofit = new Retrofit.Builder()
         .baseUrl("https://identity.whereismytransport.com/")
