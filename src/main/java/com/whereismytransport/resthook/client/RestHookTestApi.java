@@ -71,20 +71,20 @@ public class RestHookTestApi {
 
         //Instruct client to create a RESThook at the address given as a UTF-8 encoded string in the body.
         post("/webhook", (req,res) -> {
-            processHook(new RestHookRetrofitRequest("Test Hook"),req,res);
+            processHook(new RestHookRetrofitRequest("Test Hook"),req.body(),req,res);
             return res.body();
         });
 
         post("/channelwebhook", (req,res) -> {
             ChannelWebhookRequestBody body=JsonDeserializer.convert(req.body(), ChannelWebhookRequestBody.class, logs);
-            processHook(new ChannelRestHookRetrofitRequest("Test Hook", body.characterLimit),req,res);
+            processHook(new ChannelRestHookRetrofitRequest("Test Hook", body.characterLimit),body.targetUrl, req,res);
             return res.body();
         });
     }
 
-    private spark.Response processHook(RestHookRetrofitRequest webhookBody, Request req, spark.Response res){
+    private spark.Response processHook(RestHookRetrofitRequest webhookBody, String targetUrl, Request req, spark.Response res){
         try {
-            URL target = new URL(req.body());
+            URL target = new URL(targetUrl);
             String host=target.getProtocol()+"://"+target.getAuthority()+"/";
             String path=target.getFile().substring(1);
             RestHook hook=null;
