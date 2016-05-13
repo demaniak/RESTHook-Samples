@@ -77,7 +77,7 @@ public class RestHookTestApi {
 
         post("/channelwebhook", (req,res) -> {
             ChannelWebhookRequestBody body=JsonDeserializer.convert(req.body(), ChannelWebhookRequestBody.class, logs);
-            processHook(new ChannelRestHookRetrofitRequest("Test Hook",body.targetUrl,body.channelName,body.characterLimit),req,res);
+            processHook(new ChannelRestHookRetrofitRequest("Test Hook", body.characterLimit),req,res);
             return res.body();
         });
     }
