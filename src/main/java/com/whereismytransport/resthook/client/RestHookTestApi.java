@@ -2,7 +2,6 @@ package com.whereismytransport.resthook.client;
 
 import com.whereismytransport.resthook.client.auth.ClientCredentials;
 import spark.Request;
-import spark.Response;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -26,12 +25,11 @@ public class RestHookTestApi {
     private List<String> messages;
     private RestHookRepository restHookRepository;
     private Map<UUID,RestHook> hooks;
-    private ClientCredentials clientCredentials;
 
     private int port;
     private String baseUrl;
 
-    public RestHookTestApi(int port, String baseUrl, RestHookRepository restHookRepository, String clientId, String clientSecret, List<String> logs, List<String> messages){
+    public RestHookTestApi(int port, String baseUrl, RestHookRepository restHookRepository, List<String> logs, List<String> messages){
         this.logs=logs;
         this.messages=messages;
         this.restHookRepository=restHookRepository;
@@ -40,7 +38,6 @@ public class RestHookTestApi {
 
         this.port=port;
         this.baseUrl=baseUrl;
-        clientCredentials=new ClientCredentials(clientId,clientSecret);
     }
 
     public void start(){
@@ -71,23 +68,26 @@ public class RestHookTestApi {
 
         //Instruct client to create a RESThook at the address given as a UTF-8 encoded string in the body.
         post("/webhook", (req,res) -> {
-            processHook(new RestHookRetrofitRequest("Test Hook"),req.body(),req,res);
+            WebhookSparkRequestBody body=JsonDeserializer.convert(req.body(), WebhookSparkRequestBody.class, logs);
+            processHook(new RestHookRetrofitRequest("Test Hook"),body,res);
             return res.body();
         });
 
         post("/channelwebhook", (req,res) -> {
-            ChannelWebhookRequestBody body=JsonDeserializer.convert(req.body(), ChannelWebhookRequestBody.class, logs);
-            processHook(new ChannelRestHookRetrofitRequest("Test Hook", body.characterLimit),body.targetUrl, req,res);
+            ChannelWebhookSparkRequestBody body=JsonDeserializer.convert(req.body(), ChannelWebhookSparkRequestBody.class, logs);
+            logs.add("Character Limit: "+body.characterLimit);
+            processHook(new ChannelRestHookRetrofitRequest("Test Hook", body.characterLimit),body, res);
             return res.body();
         });
     }
 
-    private spark.Response processHook(RestHookRetrofitRequest webhookBody, String targetUrl, Request req, spark.Response res){
+    private spark.Response processHook(RestHookRetrofitRequest webhookBody,WebhookSparkRequestBody sparkRequestBody, spark.Response res){
         try {
-            URL target = new URL(targetUrl);
+            URL target = new URL(sparkRequestBody.targetUrl);
             String host=target.getProtocol()+"://"+target.getAuthority()+"/";
             String path=target.getFile().substring(1);
             RestHook hook=null;
+
             for (UUID hookKey:hooks.keySet()) {
                 RestHook restHook = hooks.get(hookKey);
                 if(restHook.serverUrl.equals(host) && restHook.serverRelativeUrl.equals(path)){
@@ -100,7 +100,7 @@ public class RestHookTestApi {
                 hooks.put(hook.index, hook);
             }
 
-            if(hook.createHook(webhookBody,clientCredentials,logs)){
+            if(hook.createHook(webhookBody,new ClientCredentials(sparkRequestBody.clientId,sparkRequestBody.clientSecret,sparkRequestBody.identityServerUrl,sparkRequestBody.scopes),logs)){
                 restHookRepository.addOrReplaceRestHook(hook);
                 res.status(200);
                 res.body("Webhook Created with path");

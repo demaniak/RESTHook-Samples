@@ -19,7 +19,7 @@ public interface CaptainHookApiService {
     Call<ResponseBody> createRestHook(@Url String creationPath, @Body RestHookRetrofitRequest hook, @Header("Authorization") String authorization);
     
     public static final Retrofit retrofit = new Retrofit.Builder()
-        .baseUrl("https://identity.whereismytransport.com/")
+        .baseUrl("https://webhooks.whereismytransport.com/api/v1/subscriptions/alerts")
         .addConverterFactory(GsonConverterFactory.create())
         .build();
 }

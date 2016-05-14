@@ -92,7 +92,7 @@ public class RestHook {
                 request.callbackUrl=clientUrl + relativeCallbackUrl;
 
                 // Get token to connect to CaptainHook
-                Call<Token> getTokenCall = tokenService.createToken(clientCredentials.getMap());
+                Call<Token> getTokenCall = tokenService.createToken(clientCredentials.identityUrl, clientCredentials.getMap());
 
                 Response<Token> tokenResponse = getTokenCall.execute();
 

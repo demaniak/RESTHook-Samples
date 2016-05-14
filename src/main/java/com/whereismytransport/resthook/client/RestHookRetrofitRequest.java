@@ -11,7 +11,6 @@ public class RestHookRetrofitRequest {
     public String callbackUrl;
     public String description;
 
-
     /**
      * @param description A human readable description of what this hook is for (e.g. "Post to Twitter")
      */

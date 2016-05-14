@@ -14,7 +14,7 @@ public class Startup implements SparkApplication{
     public static void main(String [] args){
         repository=new AzureRestHookRepository(RoleEnvironment.azureStorageConnectionString,RoleEnvironment.url,logs);
         repository.initialize(logs,messages);
-        restHookTestApi = new RestHookTestApi(RoleEnvironment.port, RoleEnvironment.url,repository, RoleEnvironment.clientId,RoleEnvironment.clientSecret,logs,messages);
+        restHookTestApi = new RestHookTestApi(RoleEnvironment.port, RoleEnvironment.url,repository, logs,messages);
         restHookTestApi.start();
     }
 
@@ -36,7 +36,7 @@ public class Startup implements SparkApplication{
         repository=new AzureRestHookRepository(RoleEnvironment.azureStorageConnectionString,url,logs);
         repository.initialize(logs,messages);
 
-        restHookTestApi = new RestHookTestApi(port, url,repository,RoleEnvironment.clientId,RoleEnvironment.clientSecret,logs,messages);
+        restHookTestApi = new RestHookTestApi(port, url,repository,logs,messages);
         restHookTestApi.start();
     }
 

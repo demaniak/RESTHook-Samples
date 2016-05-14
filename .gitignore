@@ -44,8 +44,12 @@ crashlytics.properties
 crashlytics-build.properties
 fabric.properties
 
+deployment
+
 .gradle
-build/
+
+build
+
 src/main/java/RoleEnvironment.java
 # Ignore Gradle GUI config
 gradle-app.setting
