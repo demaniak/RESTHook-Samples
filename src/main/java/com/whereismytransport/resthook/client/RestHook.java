@@ -100,8 +100,15 @@ public class RestHook {
                     Token token = tokenResponse.body();
                     logs.add("Input url: " +serverUrl+serverRelativeUrl);
                     logs.add("Token: " +token.access_token);
-                    Call<ResponseBody> createHookCall = restHookService.createRestHook(serverUrl+serverRelativeUrl,
-                                                                                       request, "Bearer " + token.access_token);
+                    Call<ResponseBody> createHookCall;
+                    if (request instanceof ChannelRestHookRetrofitRequest){
+                        createHookCall = restHookService.createRestHook(serverUrl+serverRelativeUrl,
+                                (ChannelRestHookRetrofitRequest)request, "Bearer " + token.access_token);
+                    }else{
+                        createHookCall = restHookService.createRestHook(serverUrl+serverRelativeUrl,
+                                request, "Bearer " + token.access_token);
+                    }
+
                     Response<ResponseBody> createHookCallResponse = createHookCall.execute();
                     if(createHookCallResponse.isSuccessful()) {
                         logs.add("Successfully created web hook");
