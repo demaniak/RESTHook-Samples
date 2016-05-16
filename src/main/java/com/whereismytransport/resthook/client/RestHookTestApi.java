@@ -100,14 +100,7 @@ public class RestHookTestApi {
                 hooks.put(hook.index, hook);
             }
 
-            if(hook.createHook(webhookBody,new ClientCredentials(sparkRequestBody.clientId,sparkRequestBody.clientSecret,sparkRequestBody.identityServerUrl,sparkRequestBody.scopes),logs)){
-                restHookRepository.addOrReplaceRestHook(hook);
-                res.status(200);
-                res.body("Webhook Created with path");
-            }else{
-                res.status(500);
-                res.body("Couldn't create webhook");
-            }
+            hook.createHook(webhookBody,new ClientCredentials(sparkRequestBody.clientId,sparkRequestBody.clientSecret,sparkRequestBody.identityServerUrl,sparkRequestBody.scopes),logs,res);
         }
         catch(Exception e){
             for (StackTraceElement stackElement:e.getStackTrace()) {

@@ -3,15 +3,14 @@ package com.whereismytransport.resthook.client;
 import com.whereismytransport.resthook.client.auth.ClientCredentials;
 import com.whereismytransport.resthook.client.auth.Token;
 import com.whereismytransport.resthook.client.auth.TokenService;
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Response;
 import spark.Request;
 
-import okhttp3.ResponseBody;
+import java.io.InputStreamReader;
 import java.util.List;
 import java.util.UUID;
-
-import static spark.Spark.post;
 
 /**
  * Created by Nick Cuthbert on 25/04/2016.
@@ -50,13 +49,13 @@ public class RestHook {
     }
 
     public spark.Response handleHookMessage(Request req, spark.Response res, List<String> messages,List<String> logs) {
-        if(req.headers().contains("x-hook-secret")){
+        if(req.headers().stream().anyMatch(x->x.toLowerCase().equals("x-hook-secret"))){
             res.status(200);
             secret=req.headers("x-hook-secret");
             res.header("X-Hook-Secret",secret);
             return res;
         }
-        else if (req.headers().contains("x-hook-signature")) {
+        else if(req.headers().stream().anyMatch(x->x.toLowerCase().equals("x-hook-signature"))){
             String body = req.body();
             String xHookSignature = req.headers("x-hook-signature");
             messages.add(req.body());
@@ -86,7 +85,7 @@ public class RestHook {
         return res;
     }
 
-    public boolean createHook(RestHookRetrofitRequest request, ClientCredentials clientCredentials, List<String> logs) {
+    public spark.Response createHook(RestHookRetrofitRequest request, ClientCredentials clientCredentials, List<String> logs, spark.Response sparkResponse) {
         try {
                 String relativeCallbackUrl = "hooks/" +index ;
                 request.callbackUrl=clientUrl + relativeCallbackUrl;
@@ -111,23 +110,35 @@ public class RestHook {
 
                     Response<ResponseBody> createHookCallResponse = createHookCall.execute();
                     if(createHookCallResponse.isSuccessful()) {
+                        sparkResponse.status(200);
+                        sparkResponse.body(createHookCallResponse.body().string());
                         logs.add("Successfully created web hook");
-                        return true;
                     }else {
+                        String body=createHookCallResponse.errorBody().string();
+                        sparkResponse.status(createHookCallResponse.code());
+                        sparkResponse.body(body);
                         logs.add("Something went wrong calling web hook setup. Response code: " + createHookCallResponse.code()+
-                                ", Message"+createHookCallResponse.message()+", Body"+createHookCallResponse.body()+", Error Body: "+createHookCallResponse.errorBody().string()
+                                ", Message"+createHookCallResponse.message()+", Body"+createHookCallResponse.body()+", Error Body: "+body
                         );
+
                     }
                 }else {
+                    sparkResponse.status(401);
+                    sparkResponse.body("Couldn't get token: "+tokenResponse.errorBody());
                     logs.add("Couldn't get token. Response Code:" +tokenResponse.code()+", Message: "+tokenResponse.message());
                 }
             }catch (Exception e) {
                 e.getStackTrace();
+                String response=e.getMessage();
                 for (StackTraceElement stackElement:e.getStackTrace()) {
                     logs.add(stackElement.toString());
+                    response+=stackElement.toString()+"\n";
+
                 }
+                sparkResponse.status(500);
+                sparkResponse.body(response);
             }
-            return false;
+            return sparkResponse;
         }
     }
 
