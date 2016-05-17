@@ -20,7 +20,6 @@ import static spark.Spark.*;
  */
 public class RestHookTestApi {
 
-    private List<String> receivedWebhookBodies = new ArrayList<>();
     private List<String> logs;
     private List<String> messages;
     private RestHookRepository restHookRepository;
@@ -53,10 +52,11 @@ public class RestHookTestApi {
             return listToMultilineString(logs);
         });
 
+
         // get received webhook bodies
         get("/received_hooks", (req, res) -> {
             res.status(200);
-            return listToMultilineString(receivedWebhookBodies);
+            return listToMultilineString(messages);
         });
 
         post("/hooks/:id", (req, res) -> {

@@ -57,6 +57,7 @@ public class RestHook {
         }
         else if(req.headers().stream().anyMatch(x->x.toLowerCase().equals("x-hook-signature"))){
             String body = req.body();
+            messages.add(body);
             String xHookSignature = req.headers("x-hook-signature");
             messages.add(req.body());
             try {
