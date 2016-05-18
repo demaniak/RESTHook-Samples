@@ -106,10 +106,10 @@ interface and you will be only sent a message whenever the agency selects the ch
 |--------------|------------ |
 | `/api/v1/subscriptions/alerts/`                                           | Creates a webhook which receives announcements from *any* agency.                         |
 | `/api/v1/subscriptions/alerts/agencies/{agencyId}`                        | Creates a webhook which receives announcements whenever `$agencyId` posts an announcement |
-| `/api/v1/subscriptions/alerts/agencies/{agencyId}/channels/{channelName}` | Creates a webhook which receives announcements whenever `$agencyId` posts an announcement to `$channelName`. This also creates the channel if it doesn't already exist. Note that a channel can only have a single webhook, and if the channel already exists, this webhook is replaced. Only clients who have `$agencyId's` credentials can create a webhook of this type. |
+| `/api/v1/subscriptions/alerts/authorities/{authorityId}/channels/{channelName}` | Creates a webhook which receives announcements whenever `$authorityId` posts an announcement to `$channelName`. This also creates the channel if it doesn't already exist. Note that a channel can only have a single webhook, and if the channel already exists, this webhook is replaced. Only clients who have `$authorityId's` credentials can create a webhook of this type. |
 
 
 ------------
 
-### *CaptainHook Url*:  https://webhooks.whereismytransport.com:444/
+### *CaptainHook Url*:  https://webhooks.whereismytransport.com/
 ### *Samples*:  http://opensource.whereismytransport.com/
