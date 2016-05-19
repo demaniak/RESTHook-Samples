@@ -130,7 +130,7 @@ interface and you will be only sent a message whenever the agency selects the ch
     "AlertId":"9af178f5-8d57-4c20-865a-8101a9ddb816",
     "AuthorityId":"66212D8D-A127-44BD-88BF-FB79B585B586",
     "Cause":"PoliceActivity",
-    "DelayDuration":20, //Minutes
+    "DelayDuration":20,
     "Description":"This is a test message",
     "InformedEntities":[{
                         "TransitMode":"Bus",
