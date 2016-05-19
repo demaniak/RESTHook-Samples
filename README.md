@@ -31,7 +31,7 @@ All `POST` requests to CaptainHook must include the entry `Authorization:
 Bearer {$token}` in the header. 
 
 Assuming that  `$endpointUrl` is a valid absolute Url and `$description` is a string describing the webhook 
-(or for channels, friendly name), the body should be:
+(or for channels, friendly name), the body should (for the most part) be:
 
 ```javascript
 {
@@ -90,6 +90,29 @@ request to the same endpoint, multiple times, only one subscription will be crea
 
 # API
 
+## Demo
+
+### *Description:*
+
+This event type was created to allow developers to test the webhook api before they 
+receive real events. A demo event is sent approximately every 30 seconds.
+
+### *Sample Body:* 
+
+```json
+{
+    "message": "This is a demo message. This particular message has a random Guid of df92f93b-4d97-4ef6-9f90-cbfaf2223080, which is a very fine Guid indeed"     
+}
+```
+
+### *Endpoints:*
+
+| Endpoint     |Verb | Description |
+|--------------|------------ |------------| 
+| `/api/v1/subscriptions/demos/` |`POST or POST` | Creates a webhook which receives demo events.                 |
+| `/api/v1/subscriptions/demos/` |`GET`  | The list of webhooks listening to the demo event.                     |
+| `/api/v1/subscriptions/demos?callbackUrl={{urlEncode($callbackUrl)}}` |`DELETE`  | Deletes the demo webhook      
+
 ## Messenger
 
 ### *Description:*
@@ -102,11 +125,11 @@ have the appropriate credentials, you can create a channel which will appear on 
 interface and you will be only sent a message whenever the agency selects the channel name.  
 
  
-| Endpoint     | Description |
-|--------------|------------ |
-| `/api/v1/subscriptions/alerts/`                                           | Creates a webhook which receives announcements from *any* agency.                         |
-| `/api/v1/subscriptions/alerts/agencies/{agencyId}`                        | Creates a webhook which receives announcements whenever `$agencyId` posts an announcement |
-| `/api/v1/subscriptions/alerts/agencies/{agencyId}/channels/{channelName}` | Creates a webhook which receives announcements whenever `$agencyId` posts an announcement to `$channelName`. This also creates the channel if it doesn't already exist. Note that a channel can only have a single webhook, and if the channel already exists, this webhook is replaced. Only clients who have `$agencyId's` credentials can create a webhook of this type. |
+| Endpoint     | Verb        | Description |
+|--------------|------------ |------------ |
+| `/api/v1/subscriptions/alerts/` | `POST` | Creates a webhook which receives announcements from *any* agency.                         |
+| `/api/v1/subscriptions/alerts/agencies/{$agencyId}` |`POST` | Creates a webhook which receives announcements whenever `$agencyId` posts an announcement |
+| `/api/v1/subscriptions/alerts/authorities/{$authorityId}/channels/{$channelName}` |`POST` | Creates a webhook which receives announcements whenever `$authority` posts an announcement to `$channelName`. This also creates the channel if it doesn't already exist. Note that a channel can only have a single webhook, and if the channel already exists, this webhook is replaced. Only clients who have `$authorityId's` credentials can create a webhook of this type. |
 
 
 ------------
