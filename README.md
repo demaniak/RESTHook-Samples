@@ -124,7 +124,26 @@ have the appropriate credentials, you can create a channel which will appear on 
 interface and you will be only sent a message whenever the agency selects the channel name.  
 
 ### *Sample Body:*
-
+```json
+{
+    "ActivePeriod": {"StartTime":"2016-08-01T00:00:00Z","EndTime":"2016-08-01T00:10:00Z"},
+    "AlertId":"9af178f5-8d57-4c20-865a-8101a9ddb816",
+    "AuthorityId":"66212D8D-A127-44BD-88BF-FB79B585B586",
+    "Cause":"PoliceActivity",
+    "DelayDuration":20, //Minutes
+    "Description":"This is a test message",
+    "InformedEntities":[{
+                        "TransitMode":"Bus",
+                        "AgencyId":"30932ecc-5408-4f68-a75d-5faae3768d60",
+                        "StopId":"stopped",
+                        "LineId":"lineId"
+                        }],
+    "MessagePriority":0,
+    "PublishedDate":"2016-08-01T00:00:00Z",
+    "Channels":["Twitter","Facebook"],
+    "Message":"IGNORE. This is a test message. Authority Message"
+}
+```
 
 ### *Endpoints:*
 
