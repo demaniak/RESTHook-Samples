@@ -16,6 +16,8 @@ Whilst our services are in private preview, the instructions detailing how to ob
 have been enumerated in a separate email. From this point onwards, it is assumed that your access token 
 is contained within the variable `$token`
 
+__Note__: You can only delete a webhook with the same client credentials used to create it
+
 ### Creating a Webhook
 
 [//]: # (This is) 
