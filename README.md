@@ -103,7 +103,37 @@ receive real events. A demo event is sent approximately every 30 seconds.
 
 ```json
 {
-    "message": "This is a demo message. This particular message has a random Guid of df92f93b-4d97-4ef6-9f90-cbfaf2223080, which is a very fine Guid indeed"     
+   "channels":[
+      "Facebook",
+      "AfriGISTest",
+      "Twitter",
+      "ArbitraryChannelOfYourChoice"
+   ],
+   "message":"This is a demo message. This particular message has a random Guid of d4502bce-376e-451b-8bf1-13965c9c4753, which is a very fine Guid indeed.",
+   "activePeriod":{
+      "startTime":"2016-07-01T09:04:15Z",
+      "endTime":"2016-07-03T09:04:15Z"
+   },
+   "alertId":"87d195d5-63f2-4ab6-860e-1a458fbf10d7",
+   "username":"demo@example.com",
+   "cause":{
+      "value":"MAINTENANCE",
+      "description":"Maintenance has caused our service to be degraded"
+   },
+   "effect":{
+      "value":"NOSERVICE",
+      "description":"The service has in effect being cancelled"
+   },
+   "delayDuration":0,
+   "description":"A brief string describing the message template. Largely for internal purposes, however may be useful for other applications.",
+   "informedEntities":[
+      {
+         "agencyId":"edObkk6o-0WN3tNZBLqKPg",
+         "stopId":"ABC"
+      }
+   ],
+   "messagePriority":"1",
+   "publishedDate":"2016-07-01T09:04:15Z"
 }
 ```
 
@@ -128,22 +158,37 @@ interface and you will be only sent a message whenever the agency selects the ch
 ### *Sample Body:*
 ```json
 {
-    "ActivePeriod": {"StartTime":"2016-08-01T00:00:00Z","EndTime":"2016-08-01T00:10:00Z"},
-    "AlertId":"9af178f5-8d57-4c20-865a-8101a9ddb816",
-    "AuthorityId":"66212D8D-A127-44BD-88BF-FB79B585B586",
-    "Cause":"PoliceActivity",
-    "DelayDuration":20,
-    "Description":"This is a test message",
-    "InformedEntities":[{
-                        "TransitMode":"Bus",
-                        "AgencyId":"30932ecc-5408-4f68-a75d-5faae3768d60",
-                        "StopId":"stopped",
-                        "LineId":"lineId"
-                        }],
-    "MessagePriority":0,
-    "PublishedDate":"2016-08-01T00:00:00Z",
-    "Channels":["Twitter","Facebook"],
-    "Message":"IGNORE. This is a test message. Authority Message"
+   "channels":[
+      "Facebook",
+      "AfriGISTest",
+      "Twitter",
+      "ArbitraryChannelOfYourChoice"
+   ],
+   "message":"This is a demo message. This particular message has a random Guid of d4502bce-376e-451b-8bf1-13965c9c4753, which is a very fine Guid indeed.",
+   "activePeriod":{
+      "startTime":"2016-07-01T09:04:15Z",
+      "endTime":"2016-07-03T09:04:15Z"
+   },
+   "alertId":"87d195d5-63f2-4ab6-860e-1a458fbf10d7",
+   "username":"demo@example.com",
+   "cause":{
+      "value":"MAINTENANCE",
+      "description":"Maintenance has caused our service to be degraded"
+   },
+   "effect":{
+      "value":"NOSERVICE",
+      "description":"The service has in effect being cancelled"
+   },
+   "delayDuration":0,
+   "description":"A brief string describing the message template. Largely for internal purposes, however may be useful for other applications.",
+   "informedEntities":[
+      {
+         "agencyId":"edObkk6o-0WN3tNZBLqKPg",
+         "stopId":"ABC"
+      }
+   ],
+   "messagePriority":"1",
+   "publishedDate":"2016-07-01T09:04:15Z"
 }
 ```
 
